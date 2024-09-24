@@ -1,3 +1,11 @@
+from tkinter import *
+from tkinter import messagebox
+
+from AddNewTask import AddNewTask
+from WindowHandler import open_new_window, BUTTONS_WIDTH, center_window
+from TreeViewHandler import create_tree_view
+from EditTask import edit_task
+
 # ---------------------------- TODO ------------------------------- #
 # strike todo 1: ListRecord class
 # strike todo 2: Add task completed time and calculate the time it took to finish the task
@@ -7,58 +15,52 @@
 # todo 6: Add EditTask module to edit existing tasks (description, etc...)
 # todo 7: Add DeleteTask module to delete existing tasks
 # todo 8: Each action (Add / Delete / Edit...) will have a "unique" window configuration
-# todo 9: Add Exit button to the main window
-
-from tkinter import *
-from tkinter import ttk
-from tkinter.ttk import Treeview
-
-from ListHandler import ListHandler
-from Menu import Menu, print_menu
-from AddNewTask import AddNewTask
-from WindowHandler import open_new_window
+# strike todo 9: Add Exit button to the main window
 
 # ---------------------------- CONSTANTS ------------------------------- #
 FONT = ("Ariel", 8, "bold")
+X_PADDING = 10
+Y_PADDING = 10
+# todo 100: Add more constants (padding, width, etc...)
+
+
+# ---------------------------- FUNCTIONS ------------------------------- #
+def exit_window():
+	"""Exits the program."""
+	if messagebox.askokcancel("Quit", "Would you like to quit?"):
+		root.destroy()
+
+
+def edit():
+
+	selected_item = tree_view.focus()
+	print(tree_view.item(selected_item)['values'][2])
+
+	#if tree_view.item(selected_item)['values'][2]:
+
+def on_double_click(event):
+	edit_task(event, tree_view)
 
 # ---------------------------- UI SETUP ------------------------------- #
 root = Tk()
 root.title("To Do List")
-root.geometry("920x400")
-root.resizable(True, False)
-tree_view = ttk.Treeview(columns = ("", "taskID", "description", "created"))
-vertical_scroll_bar = ttk.Scrollbar(root, orient = VERTICAL, command = tree_view.yview)
-horizontal_scroll_bar = ttk.Scrollbar(root, orient = HORIZONTAL, command = tree_view.xview)
-vertical_scroll_bar.grid(column = 1, row = 0, sticky = (N, S))
-horizontal_scroll_bar.grid(column = 0, row = 1, sticky = (W, E))
-tree_view['yscrollcommand'] = vertical_scroll_bar.set
-tree_view['xscrollcommand'] = horizontal_scroll_bar.set
+root.geometry("950x550")
+center_window(root)
+root.grid_rowconfigure(0, weight = 1)
+root.grid_rowconfigure(2, weight = 1)
+root.grid_columnconfigure(0, weight = 1)
+root.grid_columnconfigure(1, weight = 1)
+root.grid_columnconfigure(2, weight = 1)
+root.resizable(False, False)
 
-style = ttk.Style()
-style.configure("Treeview.Heading", font = FONT)
-style.configure('Treeview', rowheight = 30)
-tree_view.heading("#1", text = "")
-tree_view.column("#1", minwidth = 30, width = 30, anchor = "center")
-tree_view.heading("#2", text = "TaskID")
-tree_view.column("#2", minwidth = 60, width = 60, anchor = "center")
-tree_view.heading("#3", text = "Description")
-tree_view.column("#3", minwidth = 200, width = 680)
-tree_view.heading("#4", text = "Created")
-tree_view.column("#4", minwidth = 80, width = 130, anchor = "center")
+tree_view = create_tree_view(root)
+tree_view.bind("<Double-1>", on_double_click)
 
 new_task = AddNewTask()  # FIXME: Find new location.
 
-# tree_view.insert(
-# 	"",
-# 	END,
-# 	values = (new_task.user_tasks_list[0]["TaskID"], new_task.user_tasks_list[0]['Description'], new_task.user_tasks_list[0]["Created"])
-# )
-tree_view['show'] = 'headings'
-tree_view.grid(column = 0, row = 0)
+
 
 # ------ BACKGROUND SETUP --------- #
-
-# new_task = AddNewTask() # FIXME: Find new location.
 
 
 # ------ ENTRY SETUP --------- #
@@ -68,45 +70,14 @@ tree_view.grid(column = 0, row = 0)
 
 
 # ------ BUTTON SETUP --------- #
-add_button = Button(text = "Add", command = lambda: open_new_window(root, "Add", new_task, tree_view))
-add_button.grid(column = 0, row = 2)
+add_button = Button(text = "Add", width = BUTTONS_WIDTH, command = lambda: open_new_window(root, "Add", new_task, tree_view))
+add_button.grid(column = 0, row = 1, sticky = "sw", padx = X_PADDING, pady = (0, 10))
+edit_button = Button(text = "Edit", width = BUTTONS_WIDTH, command = edit)
+edit_button.grid(column = 1, row = 1, sticky = "s", padx = X_PADDING, pady = (0, 10))
+exit_button = Button(text = "Exit", width = BUTTONS_WIDTH, command = exit_window)
+exit_button.grid(column = 2, row = 1, sticky = "se", pady = (0, 10))
 
-# main_menu = Menu()
-# user_list = ListHandler()
-# is_program_running = True
-# check_button = Checkbutton(user_list.add_new_task())
 
-
+root.protocol("WM_DELETE_WINDOW", exit_window)
 root.mainloop()
 
-# while is_program_running:
-# 	user_selection = int(input(f"What would you like to do? "))
-# 	if user_selection == 1:
-# 		while True:
-# 			user_list.add_new_task()
-#
-# 			user_input = input(f"Would you like to add another record? Y / N: ").lower()
-# 			if user_input == "n":
-# 				break
-#
-# 	elif user_selection == 2:
-# 		user_list.delete_task()
-# 		user_list.print_all_tasks()
-#
-# 	elif user_selection == 3:
-# 		user_list.edit_task()
-#
-# 	elif user_selection == 4:
-# 		user_list.mark_as_completed()
-#
-# 	elif user_selection == 5:
-# 		user_list.print_all_tasks()
-#
-# 	elif user_selection == 6:
-# 		user_list.print_tasks_stats()
-#
-# 	if user_selection == 0:
-# 		is_program_running = False
-# 		exit(0)
-#
-# 	print_menu()
